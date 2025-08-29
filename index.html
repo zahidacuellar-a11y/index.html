@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Aprendizaje y Evaluación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos generales */
+        :root {
+            --color-primary: #8a2be2; /* Azul violeta */
+            --color-secondary: #ff6347; /* Tomate */
+            --color-background: linear-gradient(135deg, #f3e5f5 0%, #e0f7fa 100%);
+            --color-text: #333;
+            --color-white: #fff;
+            --color-success: #209f86;
+            --color-danger: #f14668;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--color-background);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--color-text);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: var(--color-white);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 3rem;
+            margin: 20px 0;
+            box-sizing: border-box;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h1, h2, h3 {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .button {
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(138, 43, 226, 0.4);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .button:hover {
+            background: var(--color-secondary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(255, 99, 71, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            padding: 8px;
+        }
+
+        .tab-item {
+            flex-grow: 1;
+            text-align: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--color-text);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .tab-item.active {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            box-shadow: 0 4px 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-container {
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .slide-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .illustration {
+            text-align: center;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem; /* Espacio entre las imágenes */
+        }
+
+        .illustration img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        
+        /* Estilos específicos para la simulación del sensor */
+        #sensor-sim {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .sensor-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sensor-indicator {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid #ccc;
+            background-color: #eee;
+            margin-bottom: 20px;
+            transition: all 0.5s ease-in-out;
+        }
+        .sensor-indicator.active {
+            background-color: #ff4757;
+            box-shadow: 0 0 30px #ff4757;
+            border-color: #ff4757;
+        }
+        .light-sensor-svg {
+            cursor: pointer;
+        }
+        #thermometer-path {
+            transition: all 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        /* Estilos del formulario y evaluación */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+        
+        .question-card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .options-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .options-list li {
+            margin-bottom: 15px;
+        }
+
+        .options-list label {
+            display: block;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #f0f0f0;
+        }
+        
+        .options-list label:hover {
+            background-color: #e0e0e0;
+        }
+        .options-list input[type="radio"]:checked + label {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        .options-list input[type="radio"] {
+            display: none;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-style: italic;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .feedback.correct {
+            background-color: #e6f9f0;
+            color: var(--color-success);
+            border: 1px solid var(--color-success);
+        }
+
+        .feedback.incorrect {
+            background-color: #fcebeb;
+            color: var(--color-danger);
+            border: 1px solid var(--color-danger);
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .final-score {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .score-success {
+            color: var(--color-success);
+        }
+
+        .score-fail {
+            color: var(--color-danger);
+        }
+        
+        /* Modal para la imagen */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.3s ease-in-out;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            animation: zoomIn 0.3s ease-in-out;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        
+        /* Mensaje de alerta personalizado */
+        #message-box {
+            display: none;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .bg-success { background-color: #209f86; }
+        .bg-error { background-color: #f14668; }
+
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            .button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            .tabs {
+                flex-direction: column;
+                border-bottom: none;
+            }
+            .tab-item {
+                border-bottom: 2px solid #ddd;
+                margin-bottom: 5px;
+            }
+            .tab-item.active {
+                border-bottom: 2px solid var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <!-- Pantalla de inicio -->
+    <div id="welcome-screen">
+        <h1 style="text-align: center;">¡Bienvenido/a a la App de Aprendizaje! 🚀</h1>
+        <p style="text-align: center; margin-bottom: 2rem;">Explora tres temas importantes y evalúa tus conocimientos.</p>
+        <div style="text-align: center;">
+            <button class="button" onclick="showSection('study-area')">Empezar a Estudiar</button>
+        </div>
+    </div>
+
+    <!-- Zona de Estudios -->
+    <div id="study-area" class="hidden">
+        <h2 style="text-align: center;">Zona de Estudios</h2>
+        <div class="tabs">
+            <div class="tab-item active" data-tab="ods11">ODS 11</div>
+            <div class="tab-item" data-tab="design-thinking">Design Thinking</div>
+            <div class="tab-item" data-tab="sensores">Sensores</div>
+        </div>
+
+        <!-- Contenido ODS 11 -->
+        <div id="ods11-content" class="tab-content active">
+            <!-- Slide 1 -->
+            <div class="slide-container" data-slide="0">
+                <h3>Objetivo de Desarrollo Sostenible (ODS) #11</h3>
+                <p>El ODS 11 busca lograr que las **ciudades y los asentamientos humanos sean inclusivos, seguros, resilientes y sostenibles**. Esto no solo se trata de edificios, sino de cómo viven las personas en comunidad.</p>
+                <div class="illustration">
+                    <img src="https://aulas2030.net/wp-content/uploads/2021/02/S_SDG_inverted_WEB-11.png" alt="Logotipo oficial del ODS 11">
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide-container hidden" data-slide="1">
+                <h3>Vivienda Sostenible</h3>
+                <p>Para tener ciudades sostenibles, es clave que todos tengan acceso a una **vivienda adecuada y asequible**. Las viviendas sostenibles utilizan energías renovables y reducen la huella ambiental.</p>
+                <div class="illustration">
+                    <img src="https://saaccionasostenibilidad.blob.core.windows.net/media/488551/como-hacer-piso-casa-sostenible.jpg" alt="Vivienda sostenible, con paneles solares y un jardín en el techo." class="rounded-xl shadow-lg w-full h-auto max-w-sm cursor-pointer" onclick="openModal(this)">
+                </div>
+            </div>
+            <!-- Slide 3 - Nueva diapositiva de transporte sostenible -->
+            <div class="slide-container hidden" data-slide="2">
+                <h3>Transporte Sostenible</h3>
+                <p>El **transporte público debe ser seguro, accesible y sostenible**, para reducir la contaminación y la congestión en las ciudades. 
+                </p>
+                <div class="illustration">
+                    <img src="https://www.movilidadbogota.gov.co/web/sites/default/files/Paginas/29-10-2023/viajes-sostenibles.png" alt="Opciones de transporte sostenible en la ciudad." class="rounded-xl shadow-lg w-full h-auto max-w-sm">
+                </div>
+            </div>
+            <!-- Slide 4 -->
+            <div class="slide-container hidden" data-slide="3">
+                <h3>Resiliencia y Reducción de Riesgos</h3>
+                <p>Una ciudad resiliente es aquella que puede prepararse y recuperarse de desastres naturales o eventos inesperados. Esto incluye tener **sistemas de alerta temprana** y planes de emergencia sólidos para proteger a la comunidad.</p>
+                <div class="illustration">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 17l-2 2l2 2l2 -2l-2 -2z"></path><path d="M12 21l-2 2l2 2l2 -2z" transform="rotate(45 12 21)"></path><path d="M12 17l-2 2l2 2l2 -2l-2 -2z" transform="rotate(90 12 17)"></path><path d="M12 17l-2 2l2 2l2 -2l-2 -2z" transform="rotate(135 12 17)"></path><path d="M12 17l-2 2l2 2l2 -2l-2 -2z" transform="rotate(180 12 17)"></path>
+                    </svg>
+                </div>
+            </div>
+             <!-- Slide 5 - Ciudades Sostenibles -->
+            <div class="slide-container hidden" data-slide="4">
+                <h3>¿Qué es una Ciudad Sostenible?</h3>
+                <p>Una **ciudad sostenible** es un lugar que se desarrolla de manera que satisface las necesidades de sus habitantes sin comprometer la capacidad de las futuras generaciones para satisfacer las suyas. Esto implica un equilibrio entre el bienestar social, la protección del medio ambiente y el desarrollo económico.</p>
+                <div class="illustration">
+                    <svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M25 100 L25 225 L225 225 L225 100 Z" fill="#8a2be2" />
+                        <rect x="150" y="120" width="40" height="40" fill="#fff" />
+                        <rect x="60" y="120" width="40" height="40" fill="#fff" />
+                        <rect x="150" y="180" width="40" height="20" fill="#fff" />
+                        <rect x="60" y="180" width="40" height="20" fill="#fff" />
+                        <path d="M150 120 L180 100 L210 120 L210 180 L150 180 Z" fill="#209f86" />
+                        <circle cx="125" cy="180" r="10" fill="#209f86" />
+                        <path d="M100 120 L130 100 L160 120 L160 180 L100 180 Z" fill="#ff6347" />
+                        <line x1="125" y1="180" x2="125" y2="150" stroke="#fff" stroke-width="2" />
+                        <path d="M100 80 L150 80 L125 50 L100 80 Z" fill="#209f86" />
+                        <line x1="125" y1="50" x2="125" y2="80" stroke="#fff" stroke-width="2" />
+                        <path d="M125 50 C125 30, 100 30, 100 50 C100 70, 125 70, 125 50 Z" fill="#ff6347" />
+                        <circle cx="125" cy="50" r="5" fill="#fff" />
+                    </svg>
+                </div>
+                <h4>Ejemplos:</h4>
+                <p>
+                    <ul>
+                        <li>**Áreas verdes:** Parques, jardines y techos verdes que mejoran la calidad del aire.</li>
+                        <li>**Movilidad sostenible:** Ciclovías, transporte público eficiente y áreas peatonales.</li>
+                        <li>**Energías renovables:** Uso de paneles solares y otras fuentes de energía limpia.</li>
+                    </ul>
+                </p>
+            </div>
+            <div class="slide-nav">
+                <button class="button prev-slide">Anterior</button>
+                <button class="button next-slide">Siguiente</button>
+            </div>
+        </div>
+        
+        <!-- Contenido Design Thinking -->
+        <div id="design-thinking-content" class="tab-content">
+            <!-- Slide 1 -->
+            <div class="slide-container" data-slide="0">
+                <h3>Design Thinking: Evaluación</h3>
+                <p>El Design Thinking es un proceso creativo para solucionar problemas. La última etapa es la **Evaluación**, donde se mide si la solución creada realmente está funcionando y si cumple su objetivo.</p>
+                <div class="illustration">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M15 21l-5 -5l-5 5"></path><path d="M15 11l-5 -5l-5 5"></path><circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                </div>
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide-container hidden" data-slide="1">
+                <h3>¿Qué se evalúa?</h3>
+                <p>Se evalúan los **beneficios** (cosas positivas que la solución aporta) y el **impacto** (el efecto a largo plazo en la vida de las personas o en el entorno). Se usan encuestas, entrevistas y datos para ver si se logró el objetivo.</p>
+                <div class="illustration">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="4" y1="19" x2="20" y2="19"></line><path d="M18 4l-12 12"></path><circle cx="7" cy="12" r="3"></circle><circle cx="17" cy="7" r="3"></circle>
+                    </svg>
+                </div>
+            </div>
+            <!-- Slide 3 -->
+            <div class="slide-container hidden" data-slide="2">
+                <h3>Ejemplo de Evaluación</h3>
+                <p>Si creaste una app para reciclar, podrías evaluar su éxito midiendo cuántos usuarios la descargaron, cuántos envases se reciclaron gracias a ella, y qué opinan los usuarios de la experiencia. Así sabes si el proyecto fue útil.</p>
+                <div class="illustration">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path><rect x="5" y="5" width="14" height="14" rx="2"></rect><path d="M12 12l-4 4l-2 -2l4 -4l2 2l4 -4l2 2"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="slide-nav">
+                <button class="button prev-slide">Anterior</button>
+                <button class="button next-slide">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Contenido Sensores - Mejorado -->
+        <div id="sensores-content" class="tab-content">
+            <!-- Slide 1 - Concepto General -->
+            <div class="slide-container" data-slide="0">
+                <h3>Sensores en Sistemas Automatizados</h3>
+                <p>Un **sensor** es como un "sentido" para una máquina. Detecta algo en su entorno (luz, calor, movimiento) y lo convierte en una señal eléctrica para que el sistema automatizado pueda "entenderlo".</p>
+                <div class="illustration">
+                    <svg width="250" height="250" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="125" cy="125" r="100" stroke="#8a2be2" stroke-width="10" stroke-dasharray="20,10" stroke-linecap="round" />
+                        <path d="M 125 75 C 100 100, 100 150, 125 175 M 125 175 Q 150 150, 150 125 L 125 125 Z" fill="#ff6347" stroke="#ff6347" stroke-width="5" stroke-linejoin="round" />
+                        <circle cx="125" cy="125" r="20" fill="#fff" stroke="#8a2be2" stroke-width="3" />
+                        <text x="125" y="130" text-anchor="middle" font-family="Poppins" font-size="16" fill="#8a2be2">Sensor</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Slide 2 - Simulación Sensor de Proximidad -->
+            <div class="slide-container hidden" data-slide="1">
+                <h3>Simulación: Sensor de Proximidad</h3>
+                <p>Haz clic en el botón para simular que un objeto se acerca al sensor. Verás cómo cambia su estado, lo que podría activar una alarma o una puerta automática.</p>
+                <div id="sensor-proximidad-sim" class="sensor-container">
+                    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="80" fill="#e0f7fa" />
+                        <circle id="proximity-target" cx="100" cy="100" r="20" fill="#ccc" />
+                        <path id="proximity-waves" d="M100 80 A20 20 0 0 1 100 120 M100 60 A40 40 0 0 1 100 140 M100 40 A60 60 0 0 1 100 160" fill="none" stroke="#ccc" stroke-width="4" stroke-linecap="round" opacity="0" />
+                        <circle id="proximity-sensor" cx="100" cy="100" r="10" fill="#8a2be2" />
+                    </svg>
+                    <button id="activate-proximidad" class="button">Detectar Objeto</button>
+                    <p id="proximidad-status" style="margin-top: 10px;">Sensor: Inactivo</p>
+                </div>
+            </div>
+
+            <!-- Slide 3 - Simulación Sensor de Luz -->
+            <div class="slide-container hidden" data-slide="2">
+                <h3>Simulación: Sensor de Luz</h3>
+                <p>Haz clic en la bombilla para encender la luz. Observa cómo el sensor (el círculo de colores) detecta el cambio y cambia su estado, como en un sistema de iluminación automático.</p>
+                <div id="sensor-luz-sim" class="sensor-container">
+                    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="200" height="200" fill="#fff" id="light-background"/>
+                        <circle id="light-sensor-target" cx="100" cy="150" r="20" fill="#ff4757" />
+                        <path id="bulb" class="light-sensor-svg" d="M100 30 C 80 10, 60 10, 60 30 C 60 50, 70 70, 80 80 C 80 90, 90 100, 100 100 C 110 100, 120 90, 120 80 C 130 70, 140 50, 140 30 C 140 10, 120 10, 100 30 Z" fill="#ccc"/>
+                        <path id="light-beams" d="M 100 100 L 70 170 M 100 100 L 130 170 M 100 100 L 170 110 M 100 100 L 30 110" stroke="#ffde5c" stroke-width="3" stroke-linecap="round" opacity="0"/>
+                    </svg>
+                    <p id="luz-status" style="margin-top: 10px;">Luz apagada. Sensor: Inactivo.</p>
+                </div>
+            </div>
+
+            <!-- Slide 4 - Simulación Sensor de Temperatura -->
+            <div class="slide-container hidden" data-slide="3">
+                <h3>Simulación: Sensor de Temperatura</h3>
+                <p>Usa los botones para subir o bajar la temperatura. Observa cómo el nivel de mercurio en el termómetro cambia para indicar la temperatura detectada por el sensor.</p>
+                <div id="sensor-temperatura-sim" class="sensor-container">
+                    <svg width="80" height="200" viewBox="0 0 80 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="35" y="10" width="10" height="150" rx="5" fill="#ccc" />
+                        <rect id="thermometer-path" x="37" y="160" width="6" height="0" fill="#ff4757" />
+                        <circle cx="40" cy="165" r="10" fill="#ff4757" />
+                        <text x="50" y="25" font-family="Poppins" font-size="12" fill="#333" id="temp-display">25°C</text>
+                    </svg>
+                    <div style="margin-top: 20px;">
+                        <button id="temp-up" class="button" style="padding: 10px 15px;">▲ Subir</button>
+                        <button id="temp-down" class="button" style="padding: 10px 15px;">▼ Bajar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-nav">
+                <button class="button prev-slide">Anterior</button>
+                <button class="button next-slide">Siguiente</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <button class="button" onclick="showSection('evaluation-area')">¡Ir a la Evaluación! 🎓</button>
+        </div>
+    </div>
+
+    <!-- Zona de Evaluación -->
+    <div id="evaluation-area" class="hidden">
+        <h2 style="text-align: center;">Zona de Evaluación</h2>
+        
+        <!-- Formulario de Registro -->
+        <div id="registration-form">
+            <h3 style="text-align: center;">Completa tus datos para comenzar</h3>
+            <div id="message-box" class="hidden text-sm"></div>
+            <div class="input-group">
+                <label for="student-name">Nombre completo</label>
+                <input type="text" id="student-name" required>
+            </div>
+            <div class="input-group">
+                <label for="student-course">Curso</label>
+                <input type="text" id="student-course" required>
+            </div>
+            <div class="input-group">
+                <label for="student-id">Documento de Identificación</label>
+                <input type="text" id="student-id" required>
+            </div>
+            <div style="text-align: center;">
+                <button class="button" id="start-quiz-btn">Acceder y Comenzar</button>
+            </div>
+        </div>
+
+        <!-- Cuestionario -->
+        <div id="quiz-container" class="hidden">
+            <div id="question-card" class="question-card">
+                <!-- Preguntas cargadas dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Resultados y Retroalimentación -->
+        <div id="results-area" class="hidden">
+            <h3 style="text-align: center;">Resultado de la Evaluación</h3>
+            <p id="final-score-text" class="final-score"></p>
+            <p style="text-align: center; margin-bottom: 20px;">¡Revisa la retroalimentación para aprender más!</p>
+            <div id="feedback-area">
+                <!-- Retroalimentación cargada dinámicamente -->
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="button" onclick="window.location.reload();">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- El Modal (ventana emergente para imágenes) -->
+<div id="myModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content rounded-xl" id="img01">
+</div>
+
+<script>
+    const app = document.getElementById('app');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const studyArea = document.getElementById('study-area');
+    const evaluationArea = document.getElementById('evaluation-area');
+    const registrationForm = document.getElementById('registration-form');
+    const quizContainer = document.getElementById('quiz-container');
+    const resultsArea = document.getElementById('results-area');
+    const messageBox = document.getElementById('message-box');
+    
+    // Configuración inicial
+    const googleAppScriptUrl = 'https://script.google.com/macros/s/AKfycbyCwSAejqcNWRrHyz3TAf0QlmWe96qZQXbCptALX3gRVicTme9M3liHIoDI4aUQpjGd/exec';
+    const numQuestions = 10;
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let studentData = {};
+    let studentAnswers = [];
+
+    // Contenido de las preguntas y respuestas
+    const quizQuestions = [
+        {
+            question: "¿Qué tipo de transporte ayuda a que una ciudad sea más sostenible?",
+            options: ["Autos privados", "Aviones", "Transporte público accesible", "Motos"],
+            answer: "Transporte público accesible",
+            feedback: "El transporte público accesible y eficiente reduce la cantidad de vehículos en las calles, disminuyendo la contaminación y mejorando la calidad de vida en la ciudad."
+        },
+        {
+            question: "En Design Thinking, ¿qué se evalúa para saber si un proyecto fue exitoso?",
+            options: ["Si costó poco dinero", "Si se terminó a tiempo", "El impacto y los beneficios que generó", "Si es muy popular en redes sociales"],
+            answer: "El impacto y los beneficios que generó",
+            feedback: "La evaluación en Design Thinking se enfoca en el valor real que la solución aporta a los usuarios, no solo en su costo o popularidad."
+        },
+        {
+            question: "¿Qué es un sensor?",
+            options: ["Un motor", "Un dispositivo que detecta estímulos del entorno", "Un botón", "Un tipo de cable"],
+            answer: "Un dispositivo que detecta estímulos del entorno",
+            feedback: "Un sensor es el 'sentido' de una máquina, capaz de detectar cambios físicos como la luz, el calor o el movimiento."
+        },
+        {
+            question: "Para el ODS 11, ¿qué se busca en la vivienda?",
+            options: ["Que sea grande", "Que sea lujosa", "Que sea segura y asequible para todos", "Que esté en el centro de la ciudad"],
+            answer: "Que sea segura y asequible para todos",
+            feedback: "Una vivienda segura y asequible es un pilar fundamental para crear ciudades inclusivas y sostenibles."
+        },
+        {
+            question: "El concepto de 'ciudad resiliente' se refiere a la capacidad de una ciudad para...",
+            options: ["Crecer sin límites", "Recuperarse de desastres naturales", "Aumentar su población", "Construir edificios altos"],
+            answer: "Recuperarse de desastres naturales",
+            feedback: "La resiliencia urbana es la capacidad de una ciudad para prepararse, resistir y recuperarse de eventos inesperados como desastres naturales o crisis económicas."
+        },
+        {
+            question: "¿Cuál es una de las principales metas del ODS 11?",
+            options: ["Producir más autos", "Garantizar el acceso a servicios básicos para todos", "Construir más aeropuertos", "Aumentar el número de tiendas en la ciudad"],
+            answer: "Garantizar el acceso a servicios básicos para todos",
+            feedback: "El ODS 11 busca asegurar que todos los habitantes de la ciudad, especialmente los más vulnerables, tengan acceso a servicios básicos como agua, saneamiento y energía."
+        },
+        {
+            question: "En la fase de 'Evaluación' de Design Thinking, ¿qué se revisa con las personas?",
+            options: ["La idea original", "El problema a resolver", "El prototipo y la solución", "El presupuesto del proyecto"],
+            answer: "El prototipo y la solución",
+            feedback: "En esta fase se interactúa con los usuarios para obtener retroalimentación sobre la solución final y si esta realmente resuelve el problema de forma efectiva."
+        },
+        {
+            question: "Un sensor de temperatura se usa para...",
+            options: ["Medir la luz", "Detectar objetos", "Medir el calor o el frío", "Medir la distancia"],
+            answer: "Medir el calor o el frío",
+            feedback: "Los sensores de temperatura, como los termómetros, convierten la energía térmica en una señal eléctrica que puede ser leída por un sistema."
+        },
+        {
+            question: "Un ejemplo de 'vivienda adecuada y asequible' para el ODS 11 es...",
+            options: ["Un rascacielos lujoso", "Una mansión en las afueras", "Una casa con acceso a servicios básicos y a un precio justo", "Un apartamento muy pequeño sin servicios"],
+            answer: "Una casa con acceso a servicios básicos y a un precio justo",
+            feedback: "Para el ODS 11, la asequibilidad y el acceso a servicios básicos son más importantes que el tamaño o el lujo de la vivienda."
+        },
+        {
+            question: "¿Qué se busca lograr con el Design Thinking?",
+            options: ["Aumentar la popularidad de una empresa", "Acelerar un proceso de producción", "Resolver problemas de forma creativa centrada en las personas", "Automatizar tareas repetitivas"],
+            answer: "Resolver problemas de forma creativa centrada en las personas",
+            feedback: "La esencia del Design Thinking es usar un enfoque empático y creativo para encontrar soluciones innovadoras a problemas reales, pensando siempre en las necesidades del usuario."
+        }
+    ];
+
+    // Lógica para mostrar las secciones de la app
+    function showSection(sectionId) {
+        welcomeScreen.classList.add('hidden');
+        studyArea.classList.add('hidden');
+        evaluationArea.classList.add('hidden');
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    // Lógica para la navegación de diapositivas
+    document.querySelectorAll('.tab-content').forEach(tabContent => {
+        let currentSlide = 0;
+        const slides = tabContent.querySelectorAll('.slide-container');
+        const totalSlides = slides.length;
+
+        tabContent.querySelector('.next-slide').addEventListener('click', () => {
+            slides[currentSlide].classList.add('hidden');
+            currentSlide = (currentSlide + 1) % totalSlides;
+            slides[currentSlide].classList.remove('hidden');
+            if (tabContent.id === 'sensores-content') {
+                setupSensorSimulation(currentSlide);
+            }
+        });
+
+        tabContent.querySelector('.prev-slide').addEventListener('click', () => {
+            slides[currentSlide].classList.add('hidden');
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            slides[currentSlide].classList.remove('hidden');
+            if (tabContent.id === 'sensores-content') {
+                setupSensorSimulation(currentSlide);
+            }
+        });
+    });
+
+    // Lógica para cambiar de pestaña en la zona de estudios
+    document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            tab.classList.add('active');
+            const targetContent = document.getElementById(tab.dataset.tab + '-content');
+            targetContent.classList.add('active');
+            
+            // Inicia la simulación del sensor solo si la pestaña de sensores está activa
+            if (tab.dataset.tab === 'sensores') {
+                setupSensorSimulation(0); // Reinicia la simulación al cambiar de pestaña
+            }
+        });
+    });
+
+    // Lógica para las simulaciones de sensores
+    function setupSensorSimulation(slideIndex) {
+        const proximitySim = document.getElementById('sensor-proximidad-sim');
+        const lightSim = document.getElementById('sensor-luz-sim');
+        const tempSim = document.getElementById('sensor-temperatura-sim');
+
+        if (proximitySim) proximitySim.style.display = 'none';
+        if (lightSim) lightSim.style.display = 'none';
+        if (tempSim) tempSim.style.display = 'none';
+        
+        if (slideIndex === 1 && proximitySim) { // Simulación de proximidad
+            proximitySim.style.display = 'flex';
+            const proximidadBtn = document.getElementById('activate-proximidad');
+            const proximidadStatus = document.getElementById('proximidad-status');
+            const proximityWaves = document.getElementById('proximity-waves');
+
+            proximidadBtn.onclick = () => {
+                proximidadStatus.textContent = 'Sensor: ¡Objeto detectado!';
+                proximityWaves.style.animation = 'pulse 1.5s infinite';
+                proximityWaves.style.opacity = '1';
+                setTimeout(() => {
+                    proximidadStatus.textContent = 'Sensor: Inactivo';
+                    proximityWaves.style.animation = 'none';
+                    proximityWaves.style.opacity = '0';
+                }, 1500);
+            };
+        } else if (slideIndex === 2 && lightSim) { // Simulación de luz
+            lightSim.style.display = 'flex';
+            const bulb = document.getElementById('bulb');
+            const lightBeams = document.getElementById('light-beams');
+            const lightSensor = document.getElementById('light-sensor-target');
+            const lightStatus = document.getElementById('luz-status');
+            let lightOn = false;
+            bulb.onclick = () => {
+                if (lightOn) {
+                    bulb.style.fill = '#ccc';
+                    lightBeams.style.opacity = '0';
+                    lightSensor.style.fill = '#ff4757';
+                    lightStatus.textContent = 'Luz apagada. Sensor: Inactivo.';
+                } else {
+                    bulb.style.fill = '#ffde5c';
+                    lightBeams.style.opacity = '1';
+                    lightSensor.style.fill = '#209f86';
+                    lightStatus.textContent = '¡Luz encendida! Sensor: ¡Activo!';
+                }
+                lightOn = !lightOn;
+            };
+        } else if (slideIndex === 3 && tempSim) { // Simulación de temperatura
+            tempSim.style.display = 'flex';
+            const tempUp = document.getElementById('temp-up');
+            const tempDown = document.getElementById('temp-down');
+            const tempPath = document.getElementById('thermometer-path');
+            const tempDisplay = document.getElementById('temp-display');
+            let currentTemp = 25;
+            tempUp.onclick = () => {
+                currentTemp = Math.min(currentTemp + 5, 50);
+                updateThermometer();
+            };
+            tempDown.onclick = () => {
+                currentTemp = Math.max(currentTemp - 5, 0);
+                updateThermometer();
+            };
+            function updateThermometer() {
+                const newHeight = (currentTemp / 50) * 150;
+                tempPath.setAttribute('height', newHeight);
+                tempPath.setAttribute('y', 160 - newHeight);
+                tempDisplay.textContent = `${currentTemp}°C`;
+            }
+        }
+    }
+
+    // Funciones para el modal de imágenes
+    const modal = document.getElementById("myModal");
+    const modalImg = document.getElementById("img01");
+
+    function openModal(element) {
+        modal.style.display = "flex";
+        modalImg.src = element.src;
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+    
+    // Cierra el modal si el usuario hace clic fuera de la imagen
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    // Función para mostrar mensajes en la página
+    function showMessage(message, type = 'error') {
+        messageBox.textContent = message;
+        messageBox.className = `p-3 rounded-lg text-white mb-4 block ${type === 'error' ? 'bg-error' : 'bg-success'}`;
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 3000);
+    }
+
+    // Lógica del formulario de registro
+    document.getElementById('start-quiz-btn').addEventListener('click', () => {
+        const name = document.getElementById('student-name').value;
+        const course = document.getElementById('student-course').value;
+        const id = document.getElementById('student-id').value;
+        
+        if (name && course && id) {
+            studentData = { name, course, id };
+            registrationForm.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            displayQuestion();
+        } else {
+            showMessage('Por favor, completa todos los campos.', 'error');
+        }
+    });
+
+    // Lógica del cuestionario
+    function displayQuestion() {
+        if (currentQuestionIndex < quizQuestions.length) {
+            const questionData = quizQuestions[currentQuestionIndex];
+            const questionHtml = `
+                <p><strong>Pregunta ${currentQuestionIndex + 1} de ${numQuestions}:</strong></p>
+                <p>${questionData.question}</p>
+                <ul class="options-list">
+                    ${questionData.options.map((option) => `
+                        <li>
+                            <input type="radio" id="option-${option}" name="question" value="${option}">
+                            <label for="option-${option}">${option}</label>
+                        </li>
+                    `).join('')}
+                </ul>
+                <div id="feedback-message" class="hidden feedback"></div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="button" id="next-btn">Verificar</button>
+                </div>
+            `;
+            document.getElementById('question-card').innerHTML = questionHtml;
+            document.getElementById('next-btn').addEventListener('click', handleNext);
+        } else {
+            showResults();
+        }
+    }
+
+    function handleNext() {
+        const nextBtn = document.getElementById('next-btn');
+        const selectedOption = document.querySelector('input[name="question"]:checked');
+        const feedbackMessage = document.getElementById('feedback-message');
+
+        if (nextBtn.textContent === 'Verificar') {
+            if (!selectedOption) {
+                 showMessage("Por favor, selecciona una opción.", 'error');
+                return;
+            }
+
+            const questionData = quizQuestions[currentQuestionIndex];
+            const userAnswer = selectedOption.value;
+            const isCorrect = userAnswer === questionData.answer;
+            
+            if (isCorrect) {
+                score++;
+                feedbackMessage.textContent = `¡Correcto! ${questionData.feedback}`;
+                feedbackMessage.className = 'feedback correct';
+            } else {
+                feedbackMessage.textContent = `Incorrecto. ${questionData.feedback}`;
+                feedbackMessage.className = 'feedback incorrect';
+            }
+            feedbackMessage.classList.remove('hidden');
+            selectedOption.disabled = true;
+            nextBtn.textContent = 'Siguiente';
+
+        } else if (nextBtn.textContent === 'Siguiente') {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+    }
+
+    function showResults() {
+        quizContainer.classList.add('hidden');
+        resultsArea.classList.remove('hidden');
+
+        const scoreText = `Obtuviste ${score} de ${numQuestions} puntos.`;
+        const passText = score >= 6 ? '¡Aprobado! 🎉' : '¡Inténtalo de nuevo! 😔';
+        document.getElementById('final-score-text').textContent = `${scoreText} ${passText}`;
+        document.getElementById('final-score-text').className = `final-score ${score >= 6 ? 'score-success' : 'score-fail'}`;
+
+        // Muestra la retroalimentación detallada
+        const feedbackArea = document.getElementById('feedback-area');
+        feedbackArea.innerHTML = studentAnswers.map((item, index) => `
+            <div class="question-card">
+                <p><strong>Pregunta ${index + 1}:</strong> ${item.question}</p>
+                <p>Tu respuesta: ${item.userAnswer} (${item.isCorrect ? 'Correcta' : 'Incorrecta'})</p>
+                <p>Respuesta correcta: ${item.answer}</p>
+                <div class="feedback ${item.isCorrect ? 'correct' : 'incorrect'}">
+                    <p><strong>Retroalimentación:</strong> ${item.feedback}</p>
+                </div>
+            </div>
+        `).join('');
+        
+        // Envía los datos a Google Sheets
+        sendDataToGoogleSheets();
+    }
+    
+    // Función para enviar datos a Google Sheets
+    function sendDataToGoogleSheets() {
+        const data = {
+            fecha: new Date().toISOString(),
+            nombre: studentData.name,
+            curso: studentData.course,
+            documento: studentData.id,
+            puntuacion: score,
+            aprobado: score >= 6
+        };
+
+        fetch(googleAppScriptUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Necesario para la conexión con Apps Script
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(() => console.log('Datos enviados a Google Sheets con éxito.'))
+        .catch(error => console.error('Error al enviar datos:', error));
+    }
+</script>
+
+</body>
+</html>
