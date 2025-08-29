@@ -907,6 +907,15 @@
             const userAnswer = selectedOption.value;
             const isCorrect = userAnswer === questionData.answer;
             
+            // Almacenar la respuesta del estudiante para la retroalimentación
+            studentAnswers.push({
+                question: questionData.question,
+                userAnswer: userAnswer,
+                answer: questionData.answer,
+                isCorrect: isCorrect,
+                feedback: questionData.feedback
+            });
+
             if (isCorrect) {
                 score++;
                 feedbackMessage.textContent = `¡Correcto! ${questionData.feedback}`;
@@ -977,3 +986,5 @@
 
 </body>
 </html>
+</html>
+
